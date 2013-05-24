@@ -25,7 +25,7 @@ Usage:
 
 References
 ------------
-Blog: COMING!  
+Blog: http://www.partechit.nl/nl/blog/2013/05/sitecore-seo-friendly-url-module  
 GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 
