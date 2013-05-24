@@ -3,12 +3,12 @@ SEO-friendly URL module
 
 Description
 -----------
-This module is used in all ParTech project to enable SEO-friendly URL's for Sitecore items.
-For example: The URL of an item with path "/About Us/what WE do" will be generated as "/about-us/what-we-do"
+This module is used in all ParTech project to enable SEO-friendly URL's for Sitecore items.  
+For example: The URL of an item with path "/About Us/what WE do" will be generated as "/about-us/what-we-do"  
 
-The module consists of a LinkProvider and an ItemResolver.
-The LinkProvider will make sure that a friendly URL is returned by Sitecore.Links.LinkManager.GetItemUrl().
-The ItemResolver handles requests and resolves the friendly URL's to the correct item.
+The module consists of a LinkProvider and an ItemResolver.  
+The LinkProvider will make sure that a friendly URL is returned by Sitecore.Links.LinkManager.GetItemUrl().  
+The ItemResolver handles requests and resolves the friendly URL's to the correct item.  
 
 No changes are made to Sitecore, it only requires the config file and DLL to be installed and you're good to go!
 
@@ -25,7 +25,7 @@ Usage:
 
 References
 ------------
-Blog: COMING!
+Blog: COMING!  
 GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 
