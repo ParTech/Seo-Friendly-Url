@@ -111,7 +111,8 @@ namespace ParTech.Modules.SeoUrl.Pipelines
 
                 foreach (Item child in children)
                 {
-                    if (ParTechProviders.LinkProvider.Normalize(child.DisplayName).Equals(normalizedItemName, StringComparison.InvariantCultureIgnoreCase))
+                    if (ParTechProviders.LinkProvider.Normalize(child.Name).Equals(normalizedItemName, StringComparison.InvariantCultureIgnoreCase)
+                        || ParTechProviders.LinkProvider.Normalize(child.DisplayName).Equals(normalizedItemName, StringComparison.InvariantCultureIgnoreCase))
                     {
                         result = child;
                         break;
