@@ -44,8 +44,8 @@ Release notes
 *1.0.0*
 - Initial release.
 
-*1.0.0*
-- Fixed a bug that cause item resolvement to fail if useDisplayName was set to false for the linkprovider and the requested item had a displayname that's different from the item name.
+*1.0.1*
+- Fixed a bug that caused item resolvement to fail if useDisplayName was set to false for the linkprovider and the requested item had a displayname that's different from the item name.
 
 Author
 ------
