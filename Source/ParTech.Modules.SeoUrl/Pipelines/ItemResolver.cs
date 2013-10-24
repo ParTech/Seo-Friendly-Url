@@ -69,7 +69,7 @@ namespace ParTech.Modules.SeoUrl.Pipelines
 
             // Start searching from the site root
             string resolvedPath = Sitecore.Context.Site.RootPath;
-            string[] itemNames = path.Split('/');
+            string[] itemNames = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
             for (int i = 0; i < itemNames.Length; i++)
             {

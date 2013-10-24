@@ -31,7 +31,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 Installation
 ------------
-The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.0.zip* contains:
+The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.2.zip* contains:
 - Binary (release build).
 - Configuration include file.
 
@@ -46,6 +46,9 @@ Release notes
 
 *1.0.1*
 - Fixed a bug that caused item resolvement to fail if useDisplayName was set to false for the linkprovider and the requested item had a displayname that's different from the item name.
+
+*1.0.2*
+- Added ignore for trailing slashes as suggested by scottmulligan@github
 
 Author
 ------
