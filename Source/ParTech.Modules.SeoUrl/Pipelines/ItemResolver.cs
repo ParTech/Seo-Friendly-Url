@@ -7,12 +7,14 @@ using Sitecore.Pipelines.HttpRequest;
 using Sitecore.Data.Items;
 using Sitecore.Links;
 using Sitecore.Collections;
+using Sitecore.SecurityModel;
 using Sitecore.Configuration;
 using ParTechProviders = ParTech.Modules.SeoUrl.Providers;
 
 namespace ParTech.Modules.SeoUrl.Pipelines
 {
-    public class ItemResolver : HttpRequestProcessor
+
+	public class ItemResolver : HttpRequestProcessor
     {
         public override void Process(HttpRequestArgs args)
         {
@@ -88,7 +90,10 @@ namespace ParTech.Modules.SeoUrl.Pipelines
             // Only return an item if we completely resolved the requested path
             if (resolveComplete)
             {
-                return Sitecore.Context.Database.GetItem(resolvedPath);
+	            using (new SecurityDisabler())
+	            {
+		            return Sitecore.Context.Database.GetItem(resolvedPath);
+	            }
             }
 
             return null;
@@ -105,22 +110,25 @@ namespace ParTech.Modules.SeoUrl.Pipelines
         {
             Item result = null;
 
-            if (!string.IsNullOrWhiteSpace(parentPath))
-            {
-                ChildList children = Sitecore.Context.Database.GetItem(parentPath).Children;
+	        if (string.IsNullOrWhiteSpace(parentPath)) 
+				return null;
 
-                foreach (Item child in children)
-                {
-                    if (ParTechProviders.LinkProvider.Normalize(child.Name).Equals(normalizedItemName, StringComparison.InvariantCultureIgnoreCase)
-                        || ParTechProviders.LinkProvider.Normalize(child.DisplayName).Equals(normalizedItemName, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        result = child;
-                        break;
-                    }
-                }
-            }
+	        using (new SecurityDisabler())
+	        {
+		        ChildList children = Sitecore.Context.Database.GetItem(parentPath).Children;
 
-            return result;
+		        foreach (Item child in children)
+		        {
+			        if (ParTechProviders.LinkProvider.Normalize(child.Name).Equals(normalizedItemName, StringComparison.InvariantCultureIgnoreCase)
+			            || ParTechProviders.LinkProvider.Normalize(child.DisplayName).Equals(normalizedItemName, StringComparison.InvariantCultureIgnoreCase))
+			        {
+				        result = child;
+				        break;
+			        }
+		        }
+	        }
+
+	        return result;
         }
 
         /// <summary>
