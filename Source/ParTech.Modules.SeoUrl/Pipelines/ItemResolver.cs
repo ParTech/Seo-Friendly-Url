@@ -14,6 +14,8 @@ namespace ParTech.Modules.SeoUrl.Pipelines
 {
     public class ItemResolver : HttpRequestProcessor
     {
+        private bool _wildcardItemFound = false;
+
         public override void Process(HttpRequestArgs args)
         {
             // If there was a file found on disk for the current request, don't resolve an item
@@ -32,7 +34,7 @@ namespace ParTech.Modules.SeoUrl.Pipelines
             if (args != null && !string.IsNullOrEmpty(args.Url.ItemPath) && Sitecore.Context.Item == null)
             {
                 string path = Sitecore.MainUtil.DecodeName(args.Url.ItemPath);
-                
+
                 // Resolve the item based on the requested path
                 Sitecore.Context.Item = ResolveItem(path);
             }
@@ -41,7 +43,7 @@ namespace ParTech.Modules.SeoUrl.Pipelines
             if (Sitecore.Context.Item != null && Sitecore.Context.PageMode.IsNormal)
             {
                 var provider = LinkManager.Provider as ParTechProviders.LinkProvider;
-                if (provider != null && provider.ForceFriendlyUrl)
+                if (provider != null && provider.ForceFriendlyUrl && !_wildcardItemFound) //disabling the force friendly URL in instances where a wildcard item was found
                 {
                     ForceFriendlyUrl();
                 }
@@ -61,9 +63,9 @@ namespace ParTech.Modules.SeoUrl.Pipelines
             // Only continue if the requested item belongs to the current site
             if (string.IsNullOrEmpty(Sitecore.Context.Site.RootPath) || !path.StartsWith(Sitecore.Context.Site.RootPath, StringComparison.InvariantCultureIgnoreCase))
             {
-                return null;                
+                return null;
             }
-            
+
             // Strip website's rootpath from item path
             path = path.Remove(0, Sitecore.Context.Site.RootPath.Length);
 
@@ -118,6 +120,17 @@ namespace ParTech.Modules.SeoUrl.Pipelines
                         break;
                     }
                 }
+
+                //checking to see if we have an item, if we don't, double check to see if there's a wildcard item present
+                if (result == null)
+                {
+                    var wildcardItem = Sitecore.Context.Database.GetItem(Sitecore.IO.FileUtil.MakePath(parentPath, "*", '/'));
+                    if (wildcardItem != null)
+                    {
+                        _wildcardItemFound = true;
+                        result = wildcardItem;
+                    }
+                }
             }
 
             return result;
@@ -133,7 +146,7 @@ namespace ParTech.Modules.SeoUrl.Pipelines
             {
                 string requestedPath = ParTechProviders.LinkProvider.ToRelativeUrl(HttpContext.Current.Request.RawUrl);
                 string friendlyPath = ParTechProviders.LinkProvider.ToRelativeUrl(LinkManager.GetItemUrl(Sitecore.Context.Item));
-                
+
                 // Add querystring to friendly URL
                 if (requestedPath.Contains("?"))
                 {
