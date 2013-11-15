@@ -31,7 +31,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 Installation
 ------------
-The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.2.zip* contains:
+The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.2.1.zip* contains:
 - Binary (release build).
 - Configuration include file.
 
@@ -49,6 +49,9 @@ Release notes
 
 *1.0.2*
 - Added ignore for trailing slashes as suggested by scottmulligan@github
+
+*1.0.2.1*
+- Added temporary fix for handling inaccessible items. It uses a SecurityDisabler to allow unaccessible items to be located and applies security afterwards. It's a temporary fix because the SecurityDisabler is performance wise not the best solution.
 
 Author
 ------

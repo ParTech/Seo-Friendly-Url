@@ -9,6 +9,7 @@ using Sitecore.Links;
 using Sitecore.Collections;
 using Sitecore.Configuration;
 using ParTechProviders = ParTech.Modules.SeoUrl.Providers;
+using Sitecore.SecurityModel;
 
 namespace ParTech.Modules.SeoUrl.Pipelines
 {
@@ -32,9 +33,21 @@ namespace ParTech.Modules.SeoUrl.Pipelines
             if (args != null && !string.IsNullOrEmpty(args.Url.ItemPath) && Sitecore.Context.Item == null)
             {
                 string path = Sitecore.MainUtil.DecodeName(args.Url.ItemPath);
-                
-                // Resolve the item based on the requested path
-                Sitecore.Context.Item = ResolveItem(path);
+                Item resolved;
+
+                // Resolve the item with security disabled.
+                // Security will be handled after an item has been resolved.
+                using (new SecurityDisabler())
+                {
+                    resolved = ResolveItem(path);
+                }
+
+                if (resolved != null)
+                {
+                    // Use HttpRequestArgs.ApplySecurity to apply security.
+                    // If read is not allowed, null is returned and args.PermissionDenied is set to true.
+                    Sitecore.Context.Item = args.ApplySecurity(resolved);
+                }
             }
 
             // If the item was not requested using its SEO-friendly URL, 301 redirect to force friendly URL
@@ -54,7 +67,7 @@ namespace ParTech.Modules.SeoUrl.Pipelines
         /// <param name="path"></param>
         /// <param name="useDisplayName"></param>
         /// <returns></returns>
-        private Item ResolveItem(string path)
+        public Item ResolveItem(string path)
         {
             bool resolveComplete = false;
 
