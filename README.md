@@ -31,7 +31,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 Installation
 ------------
-The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.2.zip* contains:
+The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.3.zip* contains:
 - Binary (release build).
 - Configuration include file.
 
@@ -49,6 +49,9 @@ Release notes
 
 *1.0.2*
 - Added ignore for trailing slashes as suggested by scottmulligan@github
+
+*1.0.3*
+- Fixed a bug in which FindChild() was still being called even though the parent node couldn't be resolved. This could result in an incorrect item being resolved.
 
 Author
 ------

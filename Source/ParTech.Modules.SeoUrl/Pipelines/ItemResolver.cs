@@ -52,7 +52,6 @@ namespace ParTech.Modules.SeoUrl.Pipelines
         /// Resolve the item with specified path by traversing the Sitecore tree
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="useDisplayName"></param>
         /// <returns></returns>
         private Item ResolveItem(string path)
         {
@@ -74,13 +73,19 @@ namespace ParTech.Modules.SeoUrl.Pipelines
             for (int i = 0; i < itemNames.Length; i++)
             {
                 string itemName = itemNames[i];
+
                 if (!string.IsNullOrWhiteSpace(itemName))
                 {
                     Item child = FindChild(resolvedPath, ParTechProviders.LinkProvider.Normalize(itemName));
+
                     if (child != null)
                     {
                         resolvedPath = child.Paths.FullPath;
                         resolveComplete = i == itemNames.Length - 1;
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }
@@ -99,7 +104,6 @@ namespace ParTech.Modules.SeoUrl.Pipelines
         /// </summary>
         /// <param name="parentPath"></param>
         /// <param name="normalizedItemName"></param>
-        /// <param name="useDisplayName"></param>
         /// <returns></returns>
         private Item FindChild(string parentPath, string normalizedItemName)
         {
