@@ -135,19 +135,14 @@ namespace ParTech.Modules.SeoUrl.Pipelines
             // Only apply for GET requests
             if (HttpContext.Current.Request.HttpMethod.Equals("get", StringComparison.InvariantCultureIgnoreCase))
             {
-                string requestedPath = ParTechProviders.LinkProvider.ToRelativeUrl(HttpContext.Current.Request.RawUrl);
+                string requestedPath = ParTechProviders.LinkProvider.ToRelativeUrl(HttpContext.Current.Request.Url.AbsolutePath);
                 string friendlyPath = ParTechProviders.LinkProvider.ToRelativeUrl(LinkManager.GetItemUrl(Sitecore.Context.Item));
                 
-                // Add querystring to friendly URL
-                if (requestedPath.Contains("?"))
-                {
-                    friendlyPath += requestedPath.Substring(requestedPath.IndexOf("?"));
-                }
-
                 if (requestedPath != friendlyPath)
                 {
                     // Redirect to the SEO-friendly URL
-                    string friendlyUrl = LinkManager.GetItemUrl(Sitecore.Context.Item);
+                    string friendlyUrl = string.Concat(LinkManager.GetItemUrl(Sitecore.Context.Item), HttpContext.Current.Request.Url.Query);
+
                     Redirect301(friendlyUrl);
                 }
             }

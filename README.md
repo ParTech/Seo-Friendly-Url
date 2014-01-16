@@ -20,6 +20,7 @@ Usage:
 	- applyForSites: Apply the linkprovider ONLY to for sites that are listed here (comma separated, use the names that are used in <site name=""> attributes).
 	- ignoreForSites: Don't apply the linkprovider to the sites that are listed here.
 	- forceFriendlyUrl: If true, all requests to items that are made without the friendly URL are 301-redirected to their friendly URL.
+	- trailingSlash: If true, a trailing slash is always added to the friendly URL. If false, the trailing slash is always removed.
 - Although "ignoreForSites" is optional, it's highly recommended you leave at least the default value (shell,login,admin) in there to prevent the Sitecore admin from breaking.
 
 
@@ -31,7 +32,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 Installation
 ------------
-The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.3.zip* contains:
+The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.4.zip* contains:
 - Binary (release build).
 - Configuration include file.
 
@@ -52,6 +53,9 @@ Release notes
 
 *1.0.3*
 - Fixed a bug in which FindChild() was still being called even though the parent node couldn't be resolved. This could result in an incorrect item being resolved.
+
+*1.0.4*
+- Added configuration attribute for trailing slash behaviour.
 
 Author
 ------

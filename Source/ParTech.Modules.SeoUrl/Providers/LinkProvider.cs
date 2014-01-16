@@ -22,6 +22,8 @@ namespace ParTech.Modules.SeoUrl.Providers
 
         public bool ForceFriendlyUrl { get; set; }
 
+        public bool TrailingSlash { get; set; }
+
         /// <summary>
         /// Initialize the LinkProvider
         /// </summary>
@@ -31,8 +33,13 @@ namespace ParTech.Modules.SeoUrl.Providers
         {
             base.Initialize(name, config);
 
+            // Load forceFriendlyUrl attribute value
             ForceFriendlyUrl = MainUtil.GetBool(config["forceFriendlyUrl"], false);
 
+            // Load trailingSlash attribute value
+            TrailingSlash = MainUtil.GetBool(config["trailingSlash"], false);
+
+            // Load applyForSites attribute value
             string attr = StringUtil.GetString(config["applyForSites"], string.Empty);
 
             if (!string.IsNullOrEmpty(attr))
@@ -43,6 +50,7 @@ namespace ParTech.Modules.SeoUrl.Providers
                     .Split(',');
             }
 
+            // Load ignoreForSites attribute value
             attr = StringUtil.GetString(config["ignoreForSites"], string.Empty);
 
             if (!string.IsNullOrEmpty(attr))
@@ -89,6 +97,10 @@ namespace ParTech.Modules.SeoUrl.Providers
             var uri = new Uri(url);            
             string path = Normalize(uri.GetComponents(UriComponents.Path, UriFormat.Unescaped));
 
+            string trailingSlash = TrailingSlash
+                ? "/"
+                : string.Empty;
+
             // Only include scheme and domain if the item is from another site than the current site
             Item root = Sitecore.Context.Database.GetItem(options.Site.RootPath);
 
@@ -97,11 +109,11 @@ namespace ParTech.Modules.SeoUrl.Providers
                 string domain = uri.GetComponents(UriComponents.Host, UriFormat.Unescaped);
                 string scheme = string.Concat(GetRequestScheme(), "://");
 
-                return string.Concat(scheme, domain, "/", path);
+                return string.Concat(scheme, domain, "/", path, trailingSlash);
             }
 
             // Return the relative URL
-            return string.Concat("/", path);
+            return string.Concat("/", path, trailingSlash);
         }
 
         /// <summary>
