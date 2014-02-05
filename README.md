@@ -32,7 +32,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 Installation
 ------------
-The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.4.zip* contains:
+The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.5.zip* contains:
 - Binary (release build).
 - Configuration include file.
 
@@ -56,6 +56,10 @@ Release notes
 
 *1.0.4*
 - Added configuration attribute for trailing slash behaviour.
+
+*1.0.5*
+- Fixed a bug in which in rare cases, no scheme is present in the base result of the LinkProvider which caused the Uri constructor to fail.
+
 
 Author
 ------

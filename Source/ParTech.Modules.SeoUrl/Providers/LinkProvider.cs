@@ -94,7 +94,14 @@ namespace ParTech.Modules.SeoUrl.Providers
                 UseDisplayName = options.UseDisplayName
             });
 
-            var uri = new Uri(url);            
+            // Uri constructor does not support empty protocol.
+            // In some rare cases, the base LinkProvider can return URL's without specific protocol.
+            if (url.StartsWith("://"))
+            {
+                url = string.Concat("http", url);
+            }
+
+            var uri = new Uri(url);     
             string path = Normalize(uri.GetComponents(UriComponents.Path, UriFormat.Unescaped));
 
             string trailingSlash = TrailingSlash
