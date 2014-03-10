@@ -1,0 +1,4 @@
+[submodule "References/StyleCop"]
+	path = References/StyleCop
+	url = https://github.com/ParTech/StyleCop-Dependency.git
+	branch = master
