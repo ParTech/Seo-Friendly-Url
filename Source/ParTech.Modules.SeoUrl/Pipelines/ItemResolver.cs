@@ -1,12 +1,15 @@
 ﻿namespace ParTech.Modules.SeoUrl.Pipelines
 {
     using System;
+    using System.Linq;
+    using System.Net;
     using System.Web;
     using Sitecore;
     using Sitecore.Collections;
     using Sitecore.Data.Items;
     using Sitecore.Links;
     using Sitecore.Pipelines.HttpRequest;
+    using Sitecore.SecurityModel;
     using ParTechProviders = ParTech.Modules.SeoUrl.Providers;
 
     /// <summary>
@@ -15,49 +18,11 @@
     public class ItemResolver : HttpRequestProcessor
     {
         /// <summary>
-        /// Processes the specified pipeline arguments.
-        /// </summary>
-        /// <param name="args">The args.</param>
-        public override void Process(HttpRequestArgs args)
-        {
-            // If there was a file found on disk for the current request, don't resolve an item
-            if (Context.Page != null && !string.IsNullOrWhiteSpace(Context.Page.FilePath))
-            {
-                return;
-            }
-
-            // Only process if we are not using the Core database (which means we are requesting parts of Sitecore admin)
-            if (Context.Database == null || Context.Database.Name.Equals("core", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return;
-            }
-
-            // Only continue if Sitecore has not found an item yet
-            if (args != null && !string.IsNullOrEmpty(args.Url.ItemPath) && Context.Item == null)
-            {
-                string path = MainUtil.DecodeName(args.Url.ItemPath);
-
-                // Resolve the item based on the requested path
-                Context.Item = this.ResolveItem(path);
-            }
-
-            // If the item was not requested using its SEO-friendly URL, 301 redirect to force friendly URL
-            if (Context.Item != null && Context.PageMode.IsNormal)
-            {
-                var provider = LinkManager.Provider as ParTechProviders.LinkProvider;
-                if (provider != null && provider.ForceFriendlyUrl)
-                {
-                    this.ForceFriendlyUrl();
-                }
-            }
-        }
-
-        /// <summary>
         /// Resolve the item with specified path by traversing the Sitecore tree
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Item path that is normalized by the SEO-friendly URL <see cref="ParTech.Modules.SeoUrl.Providers.LinkProvider"/>.</param>
         /// <returns></returns>
-        private Item ResolveItem(string path)
+        public static Item ResolveItem(string path)
         {
             bool resolveComplete = false;
 
@@ -70,6 +35,19 @@
             // Strip website's rootpath from item path
             path = path.Remove(0, Context.Site.RootPath.Length);
 
+            // If language embedding is enabled, there might be language name in front of the item path.
+            // Strip the language prefix from the item path.
+            if (Context.Language != null && (LinkManager.Provider.LanguageEmbedding == LanguageEmbedding.Always || LinkManager.Provider.LanguageEmbedding == LanguageEmbedding.AsNeeded))
+            {
+                string languagePrefix = string.Concat("/", Context.Language, "/").ToLower();
+
+                // Remove the language code from the item path.
+                if (path.StartsWith(languagePrefix, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    path = path.Substring(languagePrefix.Length - 1);
+                }
+            }
+
             // Start searching from the site root
             string resolvedPath = Context.Site.RootPath;
             string[] itemNames = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -80,7 +58,7 @@
 
                 if (!string.IsNullOrWhiteSpace(itemName))
                 {
-                    Item child = this.FindChild(resolvedPath, ParTechProviders.LinkProvider.Normalize(itemName));
+                    Item child = FindChild(resolvedPath, ParTechProviders.LinkProvider.Normalize(itemName));
 
                     if (child != null)
                     {
@@ -104,12 +82,80 @@
         }
 
         /// <summary>
+        /// Processes the specified pipeline arguments.
+        /// </summary>
+        /// <param name="args">The args.</param>
+        public override void Process(HttpRequestArgs args)
+        {
+            // Set default values for apply and ignore sites.
+            string[] applyForSites = { };
+            string[] ignoreForSites = { "shell", "admin", "login" };
+
+            // Try to get the apply/ignore site settings from the LinkProvider
+            var provider = LinkManager.Provider as ParTechProviders.LinkProvider;
+
+            if (provider != null)
+            {
+                applyForSites = provider.ApplyForSites;
+                ignoreForSites = provider.IgnoreForSites;
+            }
+
+            // Ignore the ItemResolver if:
+            // - The current site is in the ignore list.
+            // - The current site is not in the apply list if apply list is not empty.
+            // - There was a file found on disk for the current request.
+            // - The context database is null.
+            // - The context database is set to Core.
+            if ((ignoreForSites != null && ignoreForSites.Contains(Context.Site.Name.ToLower()))
+                || (applyForSites != null && !applyForSites.Contains(Context.Site.Name.ToLower()))
+                || (Context.Page != null && !string.IsNullOrWhiteSpace(Context.Page.FilePath))
+                || (Context.Database == null || Context.Database.Name.Equals("core", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                return;
+            }
+
+            // Only continue if Sitecore has not found an item yet
+            if (args != null && !string.IsNullOrEmpty(args.Url.ItemPath) && Context.Item == null)
+            {
+                // Remove language prefix from item path and decode the path.
+                string path = this.RemoveLanguageFromItemPath(args);
+                path = MainUtil.DecodeName(path);
+
+                Item resolved = null;
+
+                // Resolve the item with security disabled.
+                // Security will be applied after an item has been resolved.
+                using (new SecurityDisabler())
+                {
+                    resolved = ResolveItem(path);
+                }
+
+                if (resolved != null)
+                {
+                    // Use HttpRequestArgs.ApplySecurity to apply security.
+                    // If read is not allowed, null is returned and args.PermissionDenied is set to true.
+                    // This will trigger the default behavior of the Sitecore security handler.
+                    Context.Item = args.ApplySecurity(resolved);
+                }
+            }
+
+            // If the item was not requested using its SEO-friendly URL, 301 redirect to force friendly URL
+            if (Context.Item != null && Context.PageMode.IsNormal)
+            {
+                if (provider != null && provider.ForceFriendlyUrl)
+                {
+                    this.ForceFriendlyUrl();
+                }
+            }
+        }
+
+        /// <summary>
         /// Search the children of parentPath for one that matched the normalized item name
         /// </summary>
         /// <param name="parentPath"></param>
         /// <param name="normalizedItemName"></param>
         /// <returns></returns>
-        private Item FindChild(string parentPath, string normalizedItemName)
+        private static Item FindChild(string parentPath, string normalizedItemName)
         {
             Item result = null;
 
@@ -129,6 +175,33 @@
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Remove the language prefix from the arguments ItemPath.
+        /// </summary>
+        /// <param name="args">The HttpRequest arguments.</param>
+        /// <returns></returns>
+        private string RemoveLanguageFromItemPath(HttpRequestArgs args)
+        {
+            // If language embedding is enabled, there might be language name in front of the item path.
+            // We need to remove that in order to resolve the item properly.
+            if (Context.Language != null
+                && (LinkManager.Provider.LanguageEmbedding == LanguageEmbedding.Always || LinkManager.Provider.LanguageEmbedding == LanguageEmbedding.AsNeeded))
+            {
+                string languagePrefix = string.Concat("/", Context.Language, "/").ToLower();
+                string filePath = string.Concat(args.Url.FilePath, "/");
+
+                // Remove the language code from the item path.
+                if (filePath.StartsWith(languagePrefix, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    string relativeItemPath = filePath.Substring(languagePrefix.Length - 1).TrimEnd('/');
+
+                    return string.Concat(args.StartPath, relativeItemPath);
+                }
+            }
+
+            return args.Url.ItemPath;
         }
 
         /// <summary>
@@ -160,13 +233,9 @@
         {
             var context = HttpContext.Current;
 
-            context.Response.StatusCode = 301;
-            context.Response.Status = "301 Moved Permanently";
-            context.Response.CacheControl = "no-cache";
-            context.Response.AddHeader("Location", url);
-            context.Response.AddHeader("Pragma", "no-cache");
-            context.Response.Expires = -1;
-
+            context.Response.Clear();
+            context.Response.StatusCode = (int)HttpStatusCode.MovedPermanently;
+            context.Response.RedirectLocation = url;
             context.Response.End();
         }
     }
