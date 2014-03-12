@@ -6,7 +6,6 @@
     using System.Text.RegularExpressions;
     using System.Web;
     using Sitecore;
-    using Sitecore.Configuration;
     using Sitecore.Data.Items;
     using Sitecore.Links;
 
@@ -126,16 +125,9 @@
                 || (this.ApplyForSites != null && !this.ApplyForSites.Contains(options.Site.Name.ToLower()))
                 || Context.Database == null)
             {
-                // Return base GetItemUrl with URL options from the default Sitecore linkprovider 
-                // or the input options that are modified to ensure the Sitecore Client works properly.
-                return base.GetItemUrl(item, this.GetSitecoreUrlOptions(options));
+                // Return base GetItemUrl result if the SEO-friendly LinkProvider is ignored.
+                return base.GetItemUrl(item, options);
             }
-
-            // Fix implemented for Sitecore versions 6.6 update-7, 7.1 update-1, 7.2 and higher:
-            // Never embed the language code if the Languages.AlwaysStripLanguage setting is enabled and the language is known.
-            // Otherwise the friendly URL we generate will never match the request URL as Sitecore will keep removing the
-            // language from the URL and that causes a redirect loop if ForceFriendlyUrl == true.
-            bool neverEmbedLanguage = Settings.GetBoolSetting("Languages.AlwaysStripLanguage", false) && options.Language != null;
 
             // Retrieve the full URL including domain using the SiteResolving option
             string url = base.GetItemUrl(item, new UrlOptions
@@ -144,9 +136,7 @@
                 AddAspxExtension = options.AddAspxExtension,
                 EncodeNames = options.EncodeNames,
                 Language = options.Language,
-                LanguageEmbedding = neverEmbedLanguage
-                    ? LanguageEmbedding.Never
-                    : options.LanguageEmbedding,
+                LanguageEmbedding = options.LanguageEmbedding,
                 LanguageLocation = options.LanguageLocation,
                 LowercaseUrls = options.LowercaseUrls,
                 SiteResolving = true,
@@ -190,36 +180,9 @@
         /// <returns>String "http" or "https"</returns>
         private string GetRequestScheme()
         {
-            if (HttpContext.Current != null && HttpContext.Current.Request.IsSecureConnection)
-            {
-                return "https";
-            }
-
-            return "http";
-        }
-
-        /// <summary>
-        /// Gets the URL options from either the default Sitecore LinkProvider (if available)
-        /// or modifies the input URL options to make sure the Sitecore Client works properly.
-        /// </summary>
-        /// <param name="options">The options.</param>
-        /// <returns></returns>
-        private UrlOptions GetSitecoreUrlOptions(UrlOptions options)
-        {
-            // Try to find the default Sitecore link provider and use those URL options.
-            var sitecoreLinkProvider = LinkManager.Providers["sitecore"];
-
-            if (sitecoreLinkProvider != null)
-            {
-                return sitecoreLinkProvider.GetDefaultUrlOptions();
-            }
-
-            // Modify input URL options that are required for the Sitecore Client to work properly.
-            options.AddAspxExtension = true;
-            options.LanguageEmbedding = LanguageEmbedding.AsNeeded;
-            options.LanguageLocation = LanguageLocation.QueryString;
-
-            return options;
+            return HttpContext.Current != null && HttpContext.Current.Request.IsSecureConnection
+                ? "https"
+                : "http";
         }
     }
 }
