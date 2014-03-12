@@ -28,7 +28,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 
 ## Installation
-The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.8.zip]https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.8.zip* contains:
+The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.8.zip](https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.8.zip)* contains:
 - Binary (release build).
 - Configuration include file.
 
