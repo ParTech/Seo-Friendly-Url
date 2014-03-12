@@ -19,7 +19,7 @@ No changes are made to Sitecore, it only requires the config file and DLL to be 
 	- ignoreForSites: Don't apply the linkprovider to the sites that are listed here.
 	- forceFriendlyUrl: If true, all requests to items that are made without the friendly URL are 301-redirected to their friendly URL.
 	- trailingSlash: If true, a trailing slash is always added to the friendly URL. If false, the trailing slash is always removed.
-- Although "ignoreForSites" is optional, it's highly recommended you leave at least the default value (shell,login,admin) in there to prevent the Sitecore admin from breaking.
+- Although "ignoreForSites" is optional, it's highly recommended that, if you're not using the *applyForSites* setting, you leave at least the default value (shell,login,admin) in there to prevent the Sitecore admin from breaking.
 
 
 ## References
@@ -28,7 +28,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 
 ## Installation
-The Sitecore package *\Release\ParTech.Modules.SeoUrl-1.0.7.zip* contains:
+The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.8.zip]https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.8.zip* contains:
 - Binary (release build).
 - Configuration include file.
 
