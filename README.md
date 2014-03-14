@@ -28,7 +28,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 
 ## Installation
-The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.8.zip](https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.8.zip)* contains:
+The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.9.zip](https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.9.zip)* contains:
 - Binary (release build).
 - Configuration include file.
 
@@ -73,6 +73,9 @@ After installation, the module will be immediately activated.
 - Changed ItemResolver.ResolveItem method accessibility to be public static so you can call it from your own solution if needed. This was actually changed in 1.0.7, but we forgot to mention it.
 - We will publish a blog post later that explains the behavior of "Languages.AlwaysStripLanguage" and how it must be used when it's combined with the "languageEmbedding" setting of the LinkProvider, but it basically comes down to this:  
 **Never set *Languages.AlwaysStripLanguage="false"* when you are using *languageEmbedding="always"* (or *asNeeded*) with *languageLocation="filePath"* in your LinkProvider configuration**.
+
+### 1.0.9
+- Changed the logic for forcing friendly URL's again. See this blog post for more details: http://www.partechit.nl/blog/2014/03/seo-friendly-url-resolver-issue-striplanguage-and-alwaysstriplanguage
 
 
 ## Author
