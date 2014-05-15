@@ -153,9 +153,11 @@
             var uri = new Uri(url);
             string path = Normalize(uri.GetComponents(UriComponents.Path, UriFormat.Unescaped));
 
-            string trailingSlash = this.TrailingSlash
-                ? "/"
-                : string.Empty;
+            //only add a slash if there is a path
+            string trailingSlash = this.TrailingSlash && !(string.IsNullOrWhiteSpace(path))
+               ? "/"
+               : string.Empty;
+
 
             // Only include scheme and domain if the item is from another site than the current site
             Item root = Context.Database.GetItem(options.Site.RootPath);
