@@ -20,12 +20,20 @@
     public class ItemResolver : HttpRequestProcessor
     {
         /// <summary>
+        /// marks this item as a wild card
+        /// </summary>
+        private bool wildcardItemFound = false;
+
+        /// <summary>
         /// Resolve the item with specified path by traversing the Sitecore tree
         /// </summary>
         /// <param name="path">Item path that is normalized by the SEO-friendly URL <see cref="ParTech.Modules.SeoUrl.Providers.LinkProvider"/>.</param>
+        /// <param name="wildcardItemFound">Passes out whether this is a wild card item</param>
         /// <returns></returns>
-        public static Item ResolveItem(string path)
+        public static Item ResolveItem(string path, out bool wildcardItemFound)
         {
+            wildcardItemFound = false;
+
             bool resolveComplete = false;
 
             // Only continue if the requested item belongs to the current site
@@ -60,7 +68,7 @@
 
                 if (!string.IsNullOrWhiteSpace(itemName))
                 {
-                    Item child = FindChild(resolvedPath, ParTechProviders.LinkProvider.Normalize(itemName));
+                    Item child = FindChild(resolvedPath, ParTechProviders.LinkProvider.Normalize(itemName), out wildcardItemFound);
 
                     if (child != null)
                     {
@@ -117,7 +125,7 @@
             }
 
             // Only continue if Sitecore has not found an item yet
-            if (args != null && !string.IsNullOrEmpty(args.Url.ItemPath) && Context.Item == null)
+            if (args != null && !string.IsNullOrEmpty(args.Url.ItemPath) && (Context.Item == null || Context.Item.Name == "*"))
             {
                 string path = MainUtil.DecodeName(args.Url.ItemPath);
 
@@ -127,7 +135,7 @@
                 // Security will be applied after an item has been resolved.
                 using (new SecurityDisabler())
                 {
-                    resolved = ResolveItem(path);
+                    resolved = ResolveItem(path, out this.wildcardItemFound);
                 }
 
                 if (resolved != null)
@@ -142,7 +150,7 @@
             // If the item was not requested using its SEO-friendly URL, 301 redirect to force friendly URL
             if (Context.Item != null && Context.PageMode.IsNormal)
             {
-                if (provider != null && provider.ForceFriendlyUrl)
+                if (provider != null && provider.ForceFriendlyUrl && !this.wildcardItemFound)
                 {
                     this.ForceFriendlyUrl(args);
                 }
@@ -154,9 +162,11 @@
         /// </summary>
         /// <param name="parentPath"></param>
         /// <param name="normalizedItemName"></param>
+        /// <param name="wildcardItemFound">Passes out whether this is a wild card item</param>
         /// <returns></returns>
-        private static Item FindChild(string parentPath, string normalizedItemName)
+        private static Item FindChild(string parentPath, string normalizedItemName, out bool wildcardItemFound)
         {
+            wildcardItemFound = false;
             Item result = null;
 
             if (!string.IsNullOrWhiteSpace(parentPath))
@@ -170,6 +180,16 @@
                     {
                         result = child;
                         break;
+                    }
+                }
+                                
+                if (result == null)
+                {
+                    var wildcardItem = Sitecore.Context.Database.GetItem(Sitecore.IO.FileUtil.MakePath(parentPath, "*", '/'));
+                    if (wildcardItem != null)
+                    {
+                        wildcardItemFound = true;
+                        result = wildcardItem;
                     }
                 }
             }
