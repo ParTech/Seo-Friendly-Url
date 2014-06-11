@@ -73,6 +73,11 @@
                     if (child != null)
                     {
                         resolvedPath = child.Paths.FullPath;
+                        if (wildcardItemFound)
+                        {
+                            resolvedPath += "[@@name = '*']";
+                        }
+
                         resolveComplete = i == itemNames.Length - 1;
                     }
                     else
@@ -185,7 +190,7 @@
                                 
                 if (result == null)
                 {
-                    var wildcardItem = Sitecore.Context.Database.GetItem(Sitecore.IO.FileUtil.MakePath(parentPath, "*", '/'));
+                    var wildcardItem = Sitecore.Context.Database.GetItem(Sitecore.IO.FileUtil.MakePath(parentPath, "*[@@name = '*']", '/'));
                     if (wildcardItem != null)
                     {
                         wildcardItemFound = true;
