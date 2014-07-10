@@ -11,7 +11,6 @@
     using Sitecore.Pipelines.HttpRequest;
     using Sitecore.SecurityModel;
     using Sitecore.Web;
-    using Convert = System.Convert;
     using ParTechProviders = ParTech.Modules.SeoUrl.Providers;
 
     /// <summary>
