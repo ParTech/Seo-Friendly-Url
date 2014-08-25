@@ -153,7 +153,7 @@
             var uri = new Uri(url);
             string path = Normalize(uri.GetComponents(UriComponents.Path, UriFormat.Unescaped));
 
-            string trailingSlash = this.TrailingSlash
+            string trailingSlash = this.TrailingSlash && !string.IsNullOrEmpty(path)
                 ? "/"
                 : string.Empty;
 

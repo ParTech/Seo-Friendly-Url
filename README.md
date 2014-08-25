@@ -28,7 +28,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 
 ## Installation
-The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.9.zip](https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.9.zip)* contains:
+The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.10.zip](https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.10.zip)* contains:
 - Binary (release build).
 - Configuration include file.
 
@@ -76,6 +76,9 @@ After installation, the module will be immediately activated.
 
 ### 1.0.9
 - Changed the logic for forcing friendly URL's again. See this blog post for more details: http://www.partechit.nl/blog/2014/03/seo-friendly-url-resolver-issue-striplanguage-and-alwaysstriplanguage
+
+### 1.0.10
+- Fixed a bug with double trailing slash on root item requests.
 
 
 ## Author
