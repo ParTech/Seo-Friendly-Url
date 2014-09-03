@@ -118,15 +118,13 @@
             // Only continue if Sitecore has not found an item yet
             if (args != null && !string.IsNullOrEmpty(args.Url.ItemPath) && Context.Item == null)
             {
-                string path = MainUtil.DecodeName(args.Url.ItemPath);
-
                 Item resolved = null;
 
                 // Resolve the item with security disabled.
                 // Security will be applied after an item has been resolved.
                 using (new SecurityDisabler())
                 {
-                    resolved = ResolveItem(path);
+                    resolved = ResolveItem(args.Url.ItemPath);
                 }
 
                 if (resolved != null)

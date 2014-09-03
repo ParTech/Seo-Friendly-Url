@@ -80,6 +80,9 @@ After installation, the module will be immediately activated.
 ### 1.0.10
 - Fixed a bug with double trailing slash on root item requests.
 
+### 1.0.11
+- Changed handling of non-alphanumeric characters. When they are replaced by hyphens, the double occurrences of hyphens are removed.
+
 
 ## Author
 This solution was brought to you and is supported by Ruud van Falier, ParTech IT

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Specialized;
     using System.Linq;
+    using System.Net;
     using System.Text.RegularExpressions;
     using System.Web;
     using Sitecore;
@@ -49,11 +50,20 @@
         {
             if (path == null)
             {
-                return path;
+                return null;
             }
 
-            string replaced = string.Empty;
-            path.ToList().ForEach(x => replaced += char.IsLetterOrDigit(x) || x == '/' ? char.ToLower(x) : '-');
+            // Decode the path.
+            path = WebUtility.HtmlDecode(path);
+            path = MainUtil.DecodeName(path);
+            
+            // Replace characters that we don't allow and lower case the rest.
+            string replaced = new string(path.Select(x => char.IsLetterOrDigit(x) || x == '/' || x == '-'
+                    ? char.ToLower(x)
+                    : '-').ToArray());
+
+            replaced = Undouble(replaced, "-");
+            replaced = Undouble(replaced, "/");
 
             return replaced;
         }
@@ -173,6 +183,29 @@
         }
 
         #endregion
+
+        /// <summary>
+        /// Removes double occurrences from a string.
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="occurrences">The occurrences.</param>
+        /// <returns></returns>
+        /// <example>
+        /// Input: "a--b---c-d"
+        /// Occurance: "-"
+        /// Result: "a-b-c-d"
+        /// </example>
+        private static string Undouble(string input, string occurrences)
+        {
+            string find = string.Concat(occurrences, occurrences);
+
+            if (input.Contains(find))
+            {
+                return Undouble(input.Replace(find, string.Empty), occurrences);
+            }
+
+            return input;
+        }
 
         /// <summary>
         /// Find out wheter http or https is used during the current request
