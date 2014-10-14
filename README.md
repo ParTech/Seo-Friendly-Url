@@ -83,6 +83,9 @@ After installation, the module will be immediately activated.
 ### 1.0.11
 - Changed handling of non-alphanumeric characters. When they are replaced by hyphens, the double occurrences of hyphens are removed.
 
+### 1.0.12
+- Changed handling of friendly URL enforcement for wildcard items. They are now ignored.
+
 
 ## Author
 This solution was brought to you and is supported by Ruud van Falier, ParTech IT

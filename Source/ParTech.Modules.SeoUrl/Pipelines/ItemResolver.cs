@@ -136,8 +136,8 @@
                 }
             }
 
-            // If the item was not requested using its SEO-friendly URL, 301 redirect to force friendly URL
-            if (Context.Item != null && Context.PageMode.IsNormal)
+            // If the item was not requested using its SEO-friendly URL and is not a wildcard item, 301 redirect to force friendly URL.
+            if (Context.Item != null && Context.PageMode.IsNormal && !Context.Item.Name.Equals("*"))
             {
                 if (provider != null && provider.ForceFriendlyUrl)
                 {
