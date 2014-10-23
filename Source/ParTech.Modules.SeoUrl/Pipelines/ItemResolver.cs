@@ -19,6 +19,11 @@
     public class ItemResolver : HttpRequestProcessor
     {
         /// <summary>
+        /// The key for HttpContext.Items that indicates whether to disable force friendly URL.
+        /// </summary>
+        public const string DisableForceFriendlyUrlKey = "DisableForceFriendlyUrl";
+
+        /// <summary>
         /// Resolve the item with specified path by traversing the Sitecore tree
         /// </summary>
         /// <param name="path">Item path that is normalized by the SEO-friendly URL <see cref="ParTech.Modules.SeoUrl.Providers.LinkProvider"/>.</param>
@@ -139,7 +144,7 @@
             // If the item was not requested using its SEO-friendly URL and is not a wildcard item, 301 redirect to force friendly URL.
             if (Context.Item != null && Context.PageMode.IsNormal && !Context.Item.Name.Equals("*"))
             {
-                if (provider != null && provider.ForceFriendlyUrl)
+                if (provider != null && provider.ForceFriendlyUrl && args.Context.Items[DisableForceFriendlyUrlKey] == null)
                 {
                     this.ForceFriendlyUrl(args);
                 }

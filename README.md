@@ -86,6 +86,10 @@ After installation, the module will be immediately activated.
 ### 1.0.12
 - Changed handling of friendly URL enforcement for wildcard items. They are now ignored.
 
+### 1.0.13
+- Added a way to disable *force friendly URL* for specific requests from another *HttpRequestBegin* processor. This can be done by setting an HttpContext item to true in your own ItemResolver.   
+Example: `args.Context.Items[ParTech.Modules.SeoUrl.Pipelines.ItemResolver.DisableForceFriendlyUrlKey] = true;`
+
 
 ## Author
 This solution was brought to you and is supported by Ruud van Falier, ParTech IT
