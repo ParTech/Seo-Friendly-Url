@@ -93,29 +93,8 @@
         /// <param name="args">The HttpRequest arguments.</param>
         public override void Process(HttpRequestArgs args)
         {
-            // Set default values for apply and ignore sites.
-            string[] applyForSites = { };
-            string[] ignoreForSites = { "shell", "admin", "login" };
-
-            // Try to get the apply/ignore site settings from the LinkProvider
-            var provider = LinkManager.Provider as ParTechProviders.LinkProvider;
-
-            if (provider != null)
-            {
-                applyForSites = provider.ApplyForSites;
-                ignoreForSites = provider.IgnoreForSites;
-            }
-
-            // Ignore the ItemResolver if:
-            // - The current site is in the ignore list.
-            // - The current site is not in the apply list if apply list is not empty.
-            // - There was a file found on disk for the current request.
-            // - The context database is null.
-            // - The context database is set to Core.
-            if ((ignoreForSites != null && ignoreForSites.Contains(Context.Site.Name.ToLower()))
-                || (applyForSites != null && !applyForSites.Contains(Context.Site.Name.ToLower()))
-                || (Context.Page != null && !string.IsNullOrWhiteSpace(Context.Page.FilePath))
-                || (Context.Database == null || Context.Database.Name.Equals("core", StringComparison.InvariantCultureIgnoreCase)))
+            // Ignore requests if itemresolver should not be applied (see method for details).
+            if (this.IgnoreRequest())
             {
                 return;
             }
@@ -144,6 +123,8 @@
             // If the item was not requested using its SEO-friendly URL and is not a wildcard item, 301 redirect to force friendly URL.
             if (Context.Item != null && Context.PageMode.IsNormal && !Context.Item.Name.Equals("*"))
             {
+                var provider = LinkManager.Provider as ParTechProviders.LinkProvider;
+
                 if (provider != null && provider.ForceFriendlyUrl && args.Context.Items[DisableForceFriendlyUrlKey] == null)
                 {
                     this.ForceFriendlyUrl(args);
@@ -232,6 +213,37 @@
             context.Response.AddHeader("X-SFUM-Redirect", "true");
 
             context.Response.End();
+        }
+
+        /// <summary>
+        /// Indicates whether the request should be ignored.
+        /// </summary>
+        /// <returns></returns>
+        private bool IgnoreRequest()
+        {
+            // Set default values for apply and ignore sites.
+            string[] applyForSites = { };
+            string[] ignoreForSites = { "shell", "admin", "login" };
+
+            // Try to get the apply/ignore site settings from the LinkProvider
+            var provider = LinkManager.Provider as ParTechProviders.LinkProvider;
+
+            if (provider != null)
+            {
+                applyForSites = provider.ApplyForSites;
+                ignoreForSites = provider.IgnoreForSites;
+            }
+
+            // Ignore the ItemResolver if:
+            // - The current site is in the ignore list.
+            // - The current site is not in the apply list if apply list is not empty.
+            // - There was a file found on disk for the current request.
+            // - The context database is null.
+            // - The context database is set to Core.
+            return (ignoreForSites != null && ignoreForSites.Contains(Context.Site.Name.ToLower()))
+                || (applyForSites != null && !applyForSites.Contains(Context.Site.Name.ToLower()))
+                || (Context.Page != null && !string.IsNullOrWhiteSpace(Context.Page.FilePath))
+                || (Context.Database == null || Context.Database.Name.Equals("core", StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

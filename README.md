@@ -90,6 +90,11 @@ After installation, the module will be immediately activated.
 - Added a way to disable *force friendly URL* for specific requests from another *HttpRequestBegin* processor. This can be done by setting an HttpContext item to true in your own ItemResolver.   
 Example: `args.Context.Items[ParTech.Modules.SeoUrl.Pipelines.ItemResolver.DisableForceFriendlyUrlKey] = true;`
 
+### 1.0.14
+- Changed LinkProvider behaviour: it ignores all items that are not a descendant of the site's start path (i.e. not part of the site content).  
+**This is potentially a breaking change!** Make sure to review it if you are upgrading.  
+Can be toggled using the *onlyApplyForSiteContent* setting in the LinkProvider configuration file.
+
 
 ## Author
 This solution was brought to you and is supported by Ruud van Falier, ParTech IT

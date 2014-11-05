@@ -37,6 +37,11 @@
         /// </summary>
         public bool TrailingSlash { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the LinkProvider must only be applied to items that are part of the site content.
+        /// </summary>
+        public bool OnlyApplyForSiteContent { get; set; }
+
         #endregion
 
         #region Public static methods
@@ -97,6 +102,9 @@
             // Load trailingSlash attribute value
             this.TrailingSlash = MainUtil.GetBool(config["trailingSlash"], false);
 
+            // Load onlyApplyForSiteContent attribute value.
+            this.OnlyApplyForSiteContent = MainUtil.GetBool(config["onlyApplyForSiteContent"], false);
+
             // Load applyForSites attribute value
             string attr = StringUtil.GetString((object)config["applyForSites"], string.Empty);
 
@@ -131,9 +139,7 @@
             // Ignore custom linkprovider for sites listed in ignoreForSites attribute.
             // Only apply custom linkprovider for specified sites listed in applyForSites attribute (if any are specified)
             // Only continue if we have a database so we're able to resolve the item
-            if ((this.IgnoreForSites != null && this.IgnoreForSites.Contains(options.Site.Name.ToLower()))
-                || (this.ApplyForSites != null && !this.ApplyForSites.Contains(options.Site.Name.ToLower()))
-                || Context.Database == null)
+            if (this.IgnoreRequest(item, options))
             {
                 // Return base GetItemUrl result if the SEO-friendly LinkProvider is ignored.
                 return base.GetItemUrl(item, options);
@@ -216,6 +222,25 @@
             return HttpContext.Current != null && HttpContext.Current.Request.IsSecureConnection
                 ? "https"
                 : "http";
+        }
+
+        /// <summary>
+        /// Indicates whether the request to this LinkProvider should be ignored and the base result must be returned.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <param name="options">The options.</param>
+        /// <returns></returns>
+        private bool IgnoreRequest(Item item, UrlOptions options)
+        {
+            // Ignore custom linkprovider for sites listed in ignoreForSites attribute.
+            // Ignore for items that are not a child of the home item.
+            // Only apply custom linkprovider for specified sites listed in applyForSites attribute (if any are specified)
+            // Only continue if we have a database so we're able to resolve the item
+            return (this.IgnoreForSites != null && this.IgnoreForSites.Contains(options.Site.Name.ToLower()))
+                || (this.ApplyForSites != null && !this.ApplyForSites.Contains(options.Site.Name.ToLower()))
+                || Context.Database == null
+                || Context.Database.Name.Equals("core", StringComparison.InvariantCultureIgnoreCase)
+                || (this.OnlyApplyForSiteContent && !item.Paths.FullPath.StartsWith(options.Site.StartPath, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
