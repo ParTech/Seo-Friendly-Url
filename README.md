@@ -19,6 +19,7 @@ No changes are made to Sitecore, it only requires the config file and DLL to be 
 	- ignoreForSites: Don't apply the linkprovider to the sites that are listed here.
 	- forceFriendlyUrl: If true, all requests to items that are made without the friendly URL are 301-redirected to their friendly URL.
 	- trailingSlash: If true, a trailing slash is always added to the friendly URL. If false, the trailing slash is always removed.
+    - onlyApplyForSiteContent: If true, the linkprovider is only applied to items that are descendants of the site's start path.
 - Although "ignoreForSites" is optional, it's highly recommended that, if you're not using the *applyForSites* setting, you leave at least the default value (shell,login,admin) in there to prevent the Sitecore admin from breaking.
 
 
