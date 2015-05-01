@@ -114,5 +114,5 @@ Web: http://www.partechit.nl
 - Chris Gaskell
 - Scott Blair
 - David Joel Scott Turner
-- Slev Kalevra
+- Maik (slevkelevra)
 - Mike Fitzgerald
