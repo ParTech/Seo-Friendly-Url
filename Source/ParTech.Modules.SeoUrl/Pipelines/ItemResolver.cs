@@ -94,7 +94,7 @@
         public override void Process(HttpRequestArgs args)
         {
             // Ignore requests if itemresolver should not be applied (see method for details).
-            if (this.IgnoreRequest())
+            if (this.IgnoreRequest(args))
             {
                 return;
             }
@@ -108,7 +108,7 @@
                 // Security will be applied after an item has been resolved.
                 using (new SecurityDisabler())
                 {
-                    resolved = ResolveItem(args.Url.ItemPath);
+                    resolved = ResolveItem(args.Url.ItemPath) ?? ResolveItem(string.Concat(Context.Site.RootPath, args.LocalPath));
                 }
 
                 if (resolved != null)
@@ -218,8 +218,9 @@
         /// <summary>
         /// Indicates whether the request should be ignored.
         /// </summary>
+        /// <param name="args">The pipeline arguments.</param>
         /// <returns></returns>
-        private bool IgnoreRequest()
+        private bool IgnoreRequest(HttpRequestArgs args)
         {
             // Set default values for apply and ignore sites.
             string[] applyForSites = { };
@@ -240,10 +241,12 @@
             // - There was a file found on disk for the current request.
             // - The context database is null.
             // - The context database is set to Core.
+            // - The requested URL is outside of the home path.
             return (ignoreForSites != null && ignoreForSites.Contains(Context.Site.Name.ToLower()))
                 || (applyForSites != null && !applyForSites.Contains(Context.Site.Name.ToLower()))
                 || (Context.Page != null && !string.IsNullOrWhiteSpace(Context.Page.FilePath))
-                || (Context.Database == null || Context.Database.Name.Equals("core", StringComparison.InvariantCultureIgnoreCase));
+                || (Context.Database == null || Context.Database.Name.Equals("core", StringComparison.InvariantCultureIgnoreCase)
+                || args.Context.Request.Url.AbsolutePath.StartsWith("/sitecore/content", StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

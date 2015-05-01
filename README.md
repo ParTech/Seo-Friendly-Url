@@ -29,7 +29,7 @@ GitHub: https://github.com/ParTech/Seo-Friendly-Url
 
 
 ## Installation
-The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.14.zip](https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.14.zip)* contains:
+The Sitecore package *[\Release\ParTech.Modules.SeoUrl-1.0.15.zip](https://github.com/ParTech/Seo-Friendly-Url/raw/master/Release/ParTech.Modules.SeoUrl-1.0.15.zip)* contains:
 - Binary (release build).
 - Configuration include file.
 
@@ -96,6 +96,11 @@ Example: `args.Context.Items[ParTech.Modules.SeoUrl.Pipelines.ItemResolver.Disab
 **This is potentially a breaking change!** Make sure to review it if you are upgrading.  
 Can be toggled using the *onlyApplyForSiteContent* setting in the LinkProvider configuration file.
 
+### 1.0.15
+- Added ignore in ItemResolver for requests to items that are outside of the home path. This prevents a possible infinite redirect loop.
+- Changed ItemResolver behaviour to no longer assume items are always a descendant of the start path.
+- Added mention to contributors in the read me.
+
 
 ## Author
 This solution was brought to you and is supported by Ruud van Falier, ParTech IT
@@ -103,3 +108,11 @@ This solution was brought to you and is supported by Ruud van Falier, ParTech IT
 Twitter: @BrruuD / @ParTechIT   
 E-mail: ruud@partechit.nl   
 Web: http://www.partechit.nl
+
+### Contributions by
+- Scott Mulligan
+- Chris Gaskell
+- Scott Blair
+- David Joel Scott Turner
+- Slev Kalevra
+- Mike Fitzgerald
