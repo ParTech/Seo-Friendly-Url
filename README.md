@@ -99,7 +99,8 @@ Can be toggled using the *onlyApplyForSiteContent* setting in the LinkProvider c
 ### 1.0.15
 - Added ignore in ItemResolver for requests to items that are outside of the home path. This prevents a possible infinite redirect loop.
 - Changed ItemResolver behaviour to no longer assume items are always a descendant of the start path.
-- Added mention to contributors in the read me.
+- Fixed double trailing slash that occurred in some occasions.
+- Added mention to contributors in the README.
 
 
 ## Author

@@ -181,11 +181,21 @@
                 string domain = uri.GetComponents(UriComponents.Host, UriFormat.Unescaped);
                 string scheme = string.Concat(this.GetRequestScheme(), "://");
 
-                return string.Concat(scheme, domain, "/", path, trailingSlash);
+                url = string.Concat(scheme, domain, "/", path, trailingSlash);
+            }
+            else
+            {
+                // Return the relative URL
+                url = string.Concat("/", path, trailingSlash);
             }
 
-            // Return the relative URL
-            return string.Concat("/", path, trailingSlash);
+            if (this.TrailingSlash && url.EndsWith("//"))
+            {
+                // Avoid double trailing slash for some legacy instances.
+                url = url.Substring(0, url.Length - 1);
+            }
+
+            return url;
         }
 
         #endregion
